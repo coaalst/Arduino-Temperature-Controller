@@ -12,17 +12,27 @@ U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 //Data linija senzorana povezana na pin 2
 #define SENSOR_DATA_BUS 2
 
+//Pin za napajanje senzora
+#define SENSOR_POWER_LINE 4
+
 //Setup za oneWire instancu koja ce komunicirati sa svim OneWire uredjajima
 OneWire oneWire(SENSOR_DATA_BUS);
 
 //Njemu referencu saljemo senzoru 
 DallasTemperature sensors(&oneWire);
 
+//soil senzor config
+int SENSOR_PIN = A0;
+
 
 void setup() {
   //Pokreni lib za ekran
   u8g2.begin();
   u8g2.setFont(u8g2_font_crox4hb_tr);
+
+  //config power pin-a
+  pinMode(SENSOR_POWER_LINE, OUTPUT);
+  digitalWrite(SENSOR_POWER_LINE, HIGH);
   
   Serial.begin(9600);
 
@@ -48,18 +58,27 @@ void loop() {
    String temp_string = String(temp_val);
    char buffer[5];
    temp_string.toCharArray(buffer,5);
-   
+
    //Ispis na ekran
-   display_out(buffer);
-
-  //Kontrola ventilatora
-  //TODO
-
-   delay(5000);
+   display_out(buffer);  
   } 
-  
+ 
   //Exception
   else Serial.println("Greska prilikom citanja!");
+
+  Serial.print("Hvatam vlagu");
+  
+  //citanje vlaznosti
+  int soil_val = analogRead(SENSOR_PIN);
+
+  //konverzija
+  soil_val = map(soil_val, 550, 0, 0, 100);
+  
+  //ispis
+  Serial.print("Vlaga: ");
+  Serial.print(soil_val);
+  
+  delay(5000);
 }
 
 /*
@@ -84,13 +103,13 @@ float read_temperature(){
 /*
  * funkcija za ispis na OLED ekran
  */
-void display_out(char text_buffer) {
+void display_out(String text_buffer) {
   //Obrisi
   u8g2.clearBuffer();
-
+  
   //Ispis
   u8g2.drawStr(0, 15, "Temperatura:");
-  u8g2.drawStr(0, 30, buffer);
+  u8g2.drawStr(0, 30, text_buffer.c_str());
   u8g2.drawStr(35, 30, " C");
   u8g2.sendBuffer();
 }
