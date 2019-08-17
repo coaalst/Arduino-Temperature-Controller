@@ -1,10 +1,10 @@
 
 # Arduino Temperature Controller
 >Osmisljeno kao za inhouse projekat za uzgoj biljaka. 
->Trenutno zavrsena samo relugacija toplote, TODO:
->>Kontrola pumpe za vodu.
->>Kontrola svetla preko releja.
->>Logovanje na SD karticu.
+Trenutno zavrsena samo relugacija toplote, TODO:
+1. Kontrola pumpe za vodu.
+2. Kontrola svetla preko releja.
+3. Logovanje na SD karticu.
 
 [![Build Status][travis-image]][travis-url]
 
