@@ -1,6 +1,10 @@
 
 # Arduino Temperature Controller
-> Ispisuje trenutnu i regulise temperaturu prema zadatoj vrednosti pomocu ventilatora.
+>Osmisljeno kao za inhouse projekat za uzgoj biljaka. 
+>Trenutno zavrsena samo relugacija toplote, TODO:
+>>Kontrola pumpe za vodu.
+>>Kontrola svetla preko releja.
+>>Logovanje na SD karticu.
 
 [![Build Status][travis-image]][travis-url]
 
@@ -20,6 +24,8 @@ Hardver:
 ```sh
 Senzor za temperaturu: DS18B20
 Ekran: OLED 128x32 0.91inch
+Relay board
+Senzor za vlagu(kapacitet)
 ```
 
 ## Kontribucije
