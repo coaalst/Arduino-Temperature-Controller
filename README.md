@@ -3,12 +3,12 @@
 >Osmisljeno kao za inhouse projekat za uzgoj biljaka. 
 Trenutno zavrsena samo relugacija toplote.
 
-##TODO:
+[![Build Status][travis-image]][travis-url]
+
+## TODO:
 1. Kontrola pumpe za vodu.
 2. Kontrola svetla preko releja.
 3. Logovanje na SD karticu.
-
-[![Build Status][travis-image]][travis-url]
 
 # Usage
 Upload na plocu
