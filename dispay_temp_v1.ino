@@ -12,8 +12,9 @@ U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 //Data linija senzorana povezana na pin 2
 #define SENSOR_DATA_BUS 2
 
-//Pin za napajanje senzora
-#define SENSOR_POWER_LINE 4
+//Pinovi za korntolu releja
+#define relay1 3
+#define relay2 4
 
 //Setup za oneWire instancu koja ce komunicirati sa svim OneWire uredjajima
 OneWire oneWire(SENSOR_DATA_BUS);
@@ -30,9 +31,12 @@ void setup() {
   u8g2.begin();
   u8g2.setFont(u8g2_font_crox4hb_tr);
 
-  //config power pin-a
-  pinMode(SENSOR_POWER_LINE, OUTPUT);
-  digitalWrite(SENSOR_POWER_LINE, HIGH);
+  //config releja
+  pinMode(relay1, OUTPUT);
+  digitalWrite(relay1, HIGH);
+
+  pinMode(relay2, OUTPUT);
+  digitalWrite(relay2, HIGH);
   
   Serial.begin(9600);
 
@@ -56,6 +60,8 @@ void loop() {
 
    //Pravimo char array za drawStr funkciju
    String temp_string = String(temp_val);
+   if(temp_val>= 29)digitalWrite(relay1, HIGH);
+   else digitalWrite(relay1, LOW);
    char buffer[5];
    temp_string.toCharArray(buffer,5);
 
@@ -78,7 +84,7 @@ void loop() {
   Serial.print("Vlaga: ");
   Serial.print(soil_val);
   
-  delay(5000);
+  delay(2000);
 }
 
 /*
