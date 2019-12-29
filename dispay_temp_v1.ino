@@ -25,6 +25,10 @@ DallasTemperature sensors(&oneWire);
 //soil senzor config
 int SENSOR_PIN = A0;
 
+//Logger promenljive
+float temp = -1;
+float soil = -1;
+
 
 void setup() {
   //Pokreni lib za ekran
@@ -49,42 +53,80 @@ void setup() {
  * i ispisujemo je na ekran. Deo za kontrolu releja 
  * jos uvek nije zavrsen.
  * 
- * Troubleshoot preko serial monitora
- */
+* Troubleshoot preko serial monitora
+*/
 void loop() {
-//Float za temp prima vrednost
- float temp_val = read_temperature();
 
-  //Ako smo uspesno procitali
-  if(temp_val != DEVICE_DISCONNECTED_C){
+	//Float za temp prima vrednost
+	float temp_val = read_temperature();
 
-   //Pravimo char array za drawStr funkciju
-   String temp_string = String(temp_val);
-   if(temp_val>= 29)digitalWrite(relay1, HIGH);
-   else digitalWrite(relay1, LOW);
-   char buffer[5];
-   temp_string.toCharArray(buffer,5);
+	//Float za vlagu
+	float soil_val = read_soil_moisture();
+	
+	//handle
+	process_inputs(temp_val, soil_val);
+	process_log();
+	output_values(temp_val, soil_val);
 
-   //Ispis na ekran
-   display_out(buffer);  
-  } 
- 
-  //Exception
-  else Serial.println("Greska prilikom citanja!");
+	delay(2000);
+}
 
-  Serial.print("Hvatam vlagu");
-  
-  //citanje vlaznosti
-  int soil_val = analogRead(SENSOR_PIN);
+/*
+ * Funkcija za ispis na ekran
+ * @param temp_val - temperatura
+ * @param soil_val - vlaga
+ */
+void output_values(float temp_val, float soil_val){
 
-  //konverzija
-  soil_val = map(soil_val, 550, 0, 0, 100);
-  
-  //ispis
-  Serial.print("Vlaga: ");
-  Serial.print(soil_val);
-  
-  delay(2000);
+	//Pravimo char array za drawStr funkciju
+	String temp_string = String(temp_val);
+	String soil_string = String(soil_val);
+
+	char temp_buffer[5];
+	temp_string.toCharArray(temp_buffer, 5);
+
+	char soil_buffer[5];
+	soil_string.toCharArray(soil_buffer, 5);
+
+	//Ispis na ekran
+	temp_out(temp_buffer);
+	delay(2000);
+	soil_out(soil_buffer);  
+}
+
+/*
+ * Funkcija za kontrolu toka i logovanja
+ * @param temp_val - temperatura
+ * @param soil_val - vlaga
+ */
+void process_inputs(float temp_val, float soil_val){
+
+	if(temp_val>= 30)digitalWrite(relay1, HIGH);
+	else digitalWrite(relay1, LOW);
+
+	if(temp_val<=20)digitalWrite(relay1, LOW);
+
+}
+
+/*
+ * Funkcija za citanje vlage zemlje preko senzora
+ * @return float - soil_val
+ */
+float read_soil_moisture(){
+
+	Serial.print("Hvatam vlagu");
+
+	//citanje vlaznosti
+	int soil_val = analogRead(SENSOR_PIN);
+
+	//konverzija
+	soil_val = map(soil_val, 550, 0, 0, 100);
+
+	//ispis
+	Serial.print("Vlaga: ");
+	Serial.print(soil_val);
+
+	return soil_val;
 }
 
 /*
@@ -103,13 +145,17 @@ float read_temperature(){
    Serial.print("Temperatura za device 1 (index 0) je: ");
    Serial.println(tempC);
 
-   return tempC;
+    if(tempC != DEVICE_DISCONNECTED_C) return tempC;
+
+    //Exception
+  	else Serial.println("Greska prilikom citanja!");
+  	return null;
 }
 
 /*
  * funkcija za ispis na OLED ekran
  */
-void display_out(String text_buffer) {
+void temp_out(String text_buffer) {
   //Obrisi
   u8g2.clearBuffer();
   
@@ -119,3 +165,17 @@ void display_out(String text_buffer) {
   u8g2.drawStr(35, 30, " C");
   u8g2.sendBuffer();
 }
+
+/*
+ * funkcija za ispis na OLED ekran
+ */
+void soil_out(String text_buffer) {
+  //Obrisi
+  u8g2.clearBuffer();
+  
+  //Ispis
+  u8g2.drawStr(0, 15, "Vlaga:");
+  u8g2.drawStr(0, 30, text_buffer.c_str());
+  u8g2.sendBuffer();
+}
+
