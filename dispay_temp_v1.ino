@@ -2,6 +2,7 @@
 #include <U8x8lib.h>
 #include <Arduino.h>
 #include <SPI.h>
+#include <SD.h>
 #include <Wire.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
@@ -29,6 +30,10 @@ int SENSOR_PIN = A0;
 float temp = -1;
 float soil = -1;
 
+//File pointer
+File data;
+
+unsigned long timestamp = 0; 
 
 void setup() {
   //Pokreni lib za ekran
@@ -41,6 +46,10 @@ void setup() {
 
   pinMode(relay2, OUTPUT);
   digitalWrite(relay2, HIGH);
+
+  //init sd card
+  SD.begin(6);
+  data = SD.open("data.txt", FILE_WRITE);
   
   Serial.begin(9600);
 
@@ -64,11 +73,26 @@ void loop() {
 	float soil_val = read_soil_moisture();
 	
 	//handle
-	process_inputs(temp_val, soil_val);
-	process_log();
+	//process_inputs(temp_val, soil_val);
 	output_values(temp_val, soil_val);
+  log_values(temp_val, soil_val);
 
 	delay(2000);
+  time += 4;
+}
+
+/*
+ * Funkcija za zapis na karticu
+ * @param temp_val - temperatura
+ * @param soil_val - vlaga
+ */
+void log_values(float temp_val, float soil_val){
+
+	//Pravimo char array za drawStr funkciju
+	String temp_string = String(temp_val);
+	String soil_string = String(soil_val);
+
+	data.write(temp_string + "|" + soil_val + "|" + timestamp)
 }
 
 /*
@@ -125,7 +149,7 @@ float read_soil_moisture(){
 	//ispis
 	Serial.print("Vlaga: ");
 	Serial.print(soil_val);
-
+  soil_val = 0.0;
 	return soil_val;
 }
 
