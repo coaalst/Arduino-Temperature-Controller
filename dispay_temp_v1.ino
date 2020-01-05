@@ -30,6 +30,8 @@ int SENSOR_PIN = A0;
 float temp = -1;
 float soil = -1;
 
+int pinCS = 6;
+
 //File pointer
 File data;
 
@@ -48,7 +50,8 @@ void setup() {
   digitalWrite(relay2, HIGH);
 
   //init sd card
-  SD.begin(6);
+  pinMode(pinCS, OUTPUT);
+  SD.begin(pinCS);
   data = SD.open("data.txt", FILE_WRITE);
   
   Serial.begin(9600);
@@ -92,7 +95,7 @@ void log_values(float temp_val, float soil_val){
 	String temp_string = String(temp_val);
 	String soil_string = String(soil_val);
 
-	data.write(temp_string + "|" + soil_val + "|" + timestamp)
+	data.print(temp_string + "|" + soil_val + "|" + timestamp)
 }
 
 /*
