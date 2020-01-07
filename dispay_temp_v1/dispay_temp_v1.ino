@@ -1,15 +1,9 @@
-#include <U8g2lib.h>
-//#include <U8x8lib.h>
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
-//#include <Wire.h>
-#include <DallasTemperature.h>
+#include <Wire.h>
 #include <OneWire.h>
-
-//Dispay setup
-U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
-
+#include <DallasTemperature.h>
 //Data linija senzorana povezana na pin 2
 #define SENSOR_DATA_BUS 2
 
@@ -25,9 +19,6 @@ DallasTemperature sensors(&oneWire);
 int SENSOR_PIN = A0;
 
 void setup() {
-  //Pokreni lib za ekran
-  u8g2.begin();
-  u8g2.setFont(u8g2_font_crox4hb_tr);
 
   //config releja
   pinMode(3, OUTPUT);
@@ -65,17 +56,32 @@ void loop() {
 	//handle
 	//process_inputs(temp_val, soil_val);
 	output_values(temp_val, soil_val);
+  log_values(temp_val, soil_val);
+ 
+}
+
+/*
+ * Funkcija za zapis na karticu
+ * @param temp_val - temperatura
+ * @param soil_val - vlaga
+ */
+void log_values(float temp_val, float soil_val){
+  Serial.print("\n zapisujem temp:");
+  Serial.print(soil_val);
+  Serial.print("\n zapisujem vlagu:");
+  Serial.print(temp_val);
 
   //File pointer
   File data;
-  data = SD.open("data.txt", FILE_WRITE);
 
-	data.print(temp_val);
+  data.print(temp_val);
   data.print("|");
   data.print(soil_val);
+  data.print("\n");
   data.close();
 
-	delay(2000);
+  delay(2000);
+  
 }
 
 /*
@@ -84,18 +90,9 @@ void loop() {
  * @param soil_val - vlaga
  */
 void output_values(float temp_val, float soil_val){
-
-	//Pravimo char array za drawStr funkciju
-	char temp_buffer[5];
-  dtostrf(temp_val, 6, 2, temp_buffer);
-
-	char soil_buffer[5];
-  dtostrf(soil_val, 6, 2, soil_buffer);
-
-	//Ispis na ekran
-	temp_out(temp_buffer,0);
-	delay(2000);
-	temp_out(soil_buffer,1);  
+  Serial.print(soil_val);
+  Serial.print(temp_val);
+	
 }
 
 /*
@@ -126,9 +123,6 @@ float read_soil_moisture(){
 	//konverzija
 	soil_val = map(soil_val, 550, 0, 0, 100);
 
-	//ispis
-	Serial.print("Vlaga: ");
-	Serial.print(soil_val);
 	return soil_val;
 }
 
@@ -153,25 +147,4 @@ float read_temperature(){
     //Exception
   	else Serial.println("Greska prilikom citanja!");
   	return 0.0;
-}
-
-/*
- * funkcija za ispis na OLED ekran
- */
-void temp_out(String text_buffer, int type) {
-  //Obrisi
-  u8g2.clearBuffer();
-  
-  //Ispis
-  if(type == 0){
-    u8g2.drawStr(0, 15, "Temperatura:");
-    u8g2.drawStr(0, 30, text_buffer.c_str());
-    u8g2.drawStr(35, 30, " C");
-    u8g2.sendBuffer();
-  }
-
-  //Ispis
-  u8g2.drawStr(0, 15, "Vlaga:");
-  u8g2.drawStr(0, 30, text_buffer.c_str());
-  u8g2.sendBuffer();
 }
