@@ -56,9 +56,11 @@ void loop() {
 	float soil_val = read_soil_moisture();
 	
 	//handle
-	//process_inputs(temp_val, soil_val);
+	process_inputs(temp_val, soil_val);
 	output_values(temp_val, soil_val);
-  if(kill = 0)log_values(temp_val, soil_val);
+  if(kill == 0){
+    log_values(temp_val, soil_val);
+  }
  
 }
 
