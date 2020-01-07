@@ -27,8 +27,9 @@ void setup() {
 
   //config releja
   pinMode(3, OUTPUT);
+  digitalWrite(4, LOW);
   pinMode(4, OUTPUT);
-
+  digitalWrite(4, LOW);
   //init sd card
   pinMode(6, OUTPUT);
   SD.begin(6);
@@ -70,10 +71,6 @@ void loop() {
  * @param soil_val - vlaga
  */
 void log_values(float temp_val, float soil_val){
-  Serial.print("\n zapisujem temp:");
-  Serial.print(soil_val);
-  Serial.print("\n zapisujem vlagu:");
-  Serial.print(temp_val);
 
   data = SD.open("data.txt", FILE_WRITE);
 
