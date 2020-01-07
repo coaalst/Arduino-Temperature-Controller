@@ -18,14 +18,16 @@ DallasTemperature sensors(&oneWire);
 //soil senzor config
 int SENSOR_PIN = A0;
 
+//File pointer
+File data;
+
+int kill = 0;
+
 void setup() {
 
   //config releja
   pinMode(3, OUTPUT);
-  digitalWrite(3, HIGH);
-
   pinMode(4, OUTPUT);
-  digitalWrite(4, HIGH);
 
   //init sd card
   pinMode(6, OUTPUT);
@@ -56,7 +58,7 @@ void loop() {
 	//handle
 	//process_inputs(temp_val, soil_val);
 	output_values(temp_val, soil_val);
-  log_values(temp_val, soil_val);
+  if(kill = 0)log_values(temp_val, soil_val);
  
 }
 
@@ -71,8 +73,7 @@ void log_values(float temp_val, float soil_val){
   Serial.print("\n zapisujem vlagu:");
   Serial.print(temp_val);
 
-  //File pointer
-  File data;
+  data = SD.open("data.txt", FILE_WRITE);
 
   data.print(temp_val);
   data.print("|");
@@ -99,16 +100,15 @@ void output_values(float temp_val, float soil_val){
  * Funkcija za kontrolu toka i logovanja
  * @param temp_val - temperatura
  * @param soil_val - vlaga
- 
+*/ 
 void process_inputs(float temp_val, float soil_val){
 
-	if(temp_val>= 30)digitalWrite(3, HIGH);
-	else digitalWrite(3, LOW);
-
-	if(temp_val<=20)digitalWrite(3, LOW);
-
+	if(temp_val>= 27.2){
+	  digitalWrite(4, HIGH);
+    kill = 1;
+	}
 }
-*/
+
 /*
  * Funkcija za citanje vlage zemlje preko senzora
  * @return float - soil_val
@@ -135,11 +135,10 @@ float read_temperature(){
   float tempC = sensors.getTempCByIndex(0);
   
   //Trazimo temperaturu
-  Serial.print("Hvatam temperaturu");
+  Serial.println("\nHvatam temperaturu");
   sensors.requestTemperatures();
-  Serial.println("uspeh");
 
-   Serial.print("Temperatura za device 1 (index 0) je: ");
+   Serial.println("Temperatura za device 1 (index 0) je: ");
    Serial.println(tempC);
 
     if(tempC != DEVICE_DISCONNECTED_C) return tempC;
