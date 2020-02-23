@@ -27,10 +27,7 @@ void setup() {
 
   //config releja
   pinMode(3, OUTPUT);
-  digitalWrite(4, LOW);
-  pinMode(4, OUTPUT);
-  digitalWrite(4, LOW);
-  //init sd card
+  pinMode(4, OUTPUT);  //init sd card
   pinMode(6, OUTPUT);
   SD.begin(6);
   
@@ -50,6 +47,8 @@ void setup() {
 */
 void loop() {
 
+  
+  
 	//Float za temp prima vrednost
 	float temp_val = read_temperature();
 
@@ -102,10 +101,22 @@ void output_values(float temp_val, float soil_val){
 */ 
 void process_inputs(float temp_val, float soil_val){
 
-	if(temp_val>= 27.2){
-	  digitalWrite(4, HIGH);
+	if(temp_val>= 26.0){
+    digitalWrite(3, LOW);
     kill = 1;
 	}
+  else{
+  digitalWrite(3, HIGH);
+ }
+ 
+ if(soil_val <=0){
+  digitalWrite(4, LOW);
+ }
+  else{
+  digitalWrite(4, HIGH);
+ }
+
+
 }
 
 /*
