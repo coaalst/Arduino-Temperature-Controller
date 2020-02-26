@@ -105,14 +105,14 @@ void process_inputs(float temp_val, float soil_val){
     digitalWrite(3, LOW);
     kill = 1;
 	}
-  else{
+  if(temp_val<= 26.0){
   digitalWrite(3, HIGH);
  }
  
  if(soil_val <=0){
   digitalWrite(4, LOW);
  }
-  else{
+  if(soil_val > 0){
   digitalWrite(4, HIGH);
  }
 
